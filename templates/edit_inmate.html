@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Edit Inmate - IIMS 1.0</title>
+{% endblock %}
+
+{% block body %}
+<div class="edit-dashboard-container">
+    <header>
+        <a href="{{ url_for('dashboard') }}" class="logout-link" title="Back to Dashboard">⬅️</a>
+        <h5>Edit Inmate</h5>
+    </header>
+
+    <main class="edit-main">
+        <section class="edit-section">
+            <h2 class="edit-form-title">Edit Inmate Information</h2>
+
+            <form action="{{ url_for('edit_inmate', inmate_id=inmate.id) }}" 
+                  method="post" enctype="multipart/form-data" id="edit-inmate-form">
+
+                <div class="edit-form-group">
+                    <label>Inmate Name:</label>
+                    <div class="name-inputs">
+                        <input type="text" name="last" placeholder="Last" value="{{ last }}" required>
+                        <input type="text" name="first" placeholder="First" value="{{ first }}" required>
+                        <input type="text" name="initial" placeholder="M.I." value="{{ initial }}" required>
+                    </div>
+                </div>
+
+                <div class="edit-form-group">
+                    <label>Age:</label>
+                    <input type="number" name="age" value="{{ inmate.age }}" min="18" max="120" required>
+                </div>
+
+                <div class="edit-form-group">
+                    <label>Gender:</label>
+                    <div class="edit-radio-container">
+                        <label><input type="radio" name="gender" value="Male" {% if inmate.gender == 'Male' %}checked{% endif %}> Male</label>
+                        <label><input type="radio" name="gender" value="Female" {% if inmate.gender == 'Female' %}checked{% endif %}> Female</label>
+                    </div>
+                </div>
+
+                <div class="edit-form-group">
+                    <label>Nationality:</label>
+                        <select name="nationality" required>
+                            {% for country in nationalities %}
+                                <option value="{{ country }}"
+                                    {% if inmate.nationality and inmate.nationality.strip().lower() == country.lower() %}
+                                        selected
+                                    {% endif %}>
+                                    {{ country }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                </div>
+
+                <div class="edit-form-group">
+                    <label>Security Level:</label>
+                    <input type="number" 
+                           name="security_level" 
+                           min="1" max="5" step="1"
+                           value="{{ ['Low', 'Medium', 'High', 'Maximum', 'Death'].index(inmate.security_level.split()[0]) + 1 if inmate.security_level else 1 }}"
+                           required>
+                </div>
+
+                <div class="edit-form-group">
+                    <label>Date Apprehended:</label>
+                    <input type="date" name="Apprehended" value="{{ inmate.date_apprehended }}">
+                </div>
+
+                <div class="edit-form-group">
+                    <label>Update Evidence File (optional):</label>
+                    <input type="file" name="evidence_file">
+                </div>
+
+                {% if inmate.evidence_file %}
+                    <div class="edit-current-file">
+                        <p><strong>Current File:</strong></p>
+                        <a href="{{ url_for('uploaded_file', filename=inmate.evidence_file) }}" target="_blank">
+                            {{ inmate.evidence_file }}
+                        </a>
+                    </div>
+                {% else %}
+                    <p><em>No evidence file currently uploaded.</em></p>
+                {% endif %}
+
+                <div class="edit-form-buttons">
+                    <button type="submit" class="edit-confirm-btn">✅ Confirm</button>
+                    <a href="{{ url_for('dashboard') }}" class="edit-cancel-btn">❌ Cancel</a>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+{% endblock %}

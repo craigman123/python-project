@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Dashboard - IIMS 1.0</title>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    <header>
+        <h5>Inmate Information Manager</h5>
+        <a href="{{ url_for('logout') }}" class="logout-link" title="Logout">🚪</a>
+    </header>
+
+    <div class="post-container">
+        <section class="post-section">
+            <h2 id="form-title">Append Inmate</h2>
+            
+            <div>
+                <form action="{{ url_for('dashboard') }}" method="post" enctype="multipart/form-data" id="post-form">
+
+
+                    <input type="hidden" name="inmate_id" id="inmate-id" value="">
+                    <!-- Ngalan ni diri -->
+                    <div class = "name">
+                        <label>Inmate Name:</label>
+                        <input name="last" placeholder="Last" required>
+                        <input name="first" placeholder="First" required>
+                        <input name="initial" placeholder="Initial" required>
+                        
+                    </div>
+
+                    <div class = "age">
+                    <!-- Age ni dri dapita-->
+                    <label for="age">Age:</label>
+                    <input type="number" id="age" name="age" min="18" max="120" required placeholder="Enter Age">
+                    </div>
+
+                    <!-- Gender ni-->
+                    <label>Gender:</label>
+                    <div class="radio-container">
+                        <label><input type="radio" name="gender" value="Male" required> Male</label>
+                        <label><input type="radio" name="gender" value="Female" required> Female</label>
+                    </div>
+
+                    <div class = "nationality">
+                    <!-- Nationality ni nga section-->
+                    <label for="nationality">Nationality: </label>
+                    <select name="nationality" id="nationality" required>
+                        <option value="">--Select your nationality--</option>
+                        {% for country in nationalities %}
+                            <option value="{{ country }}" >{{ country }}</option>
+                        {% endfor %}
+                    </select>
+                    </div>
+
+                    <div class="lvl">
+                    <!-- Security Level ni dri -->
+                    <label for="security-level">Security Level:</label>
+                    <input type="number" id="security-level" name="security_level" min="1" max="5" step="1" required>
+                    </div>
+
+                    <div class="date">
+                    <!-- Dates ni-->
+                    <label for="Apprehended">Date Apprehended:</label>
+                    <input type="date" id="Apprehended" name="Apprehended">
+
+                    <label for="current-date">Current Date:</label>
+                    <input type="date" id="current-date" name="current_date">
+                    </div>    
+
+                    <script>
+                        // Auto-fill date dri
+                        const today = new Date().toISOString().split('T')[0];
+                        document.getElementById('current-date').value = today;
+                    </script>
+
+                    <!-- Upload Evidence ni-->
+                    <div class="upload-box">
+                        <label for="fileInput">📁 Upload Evidence: One File Only!</label>
+                            <input type="file" id="fileInput" name="evidence_file" required>
+                        <div id="preview-container"></div>
+                    </div>
+
+                    <!--Submit ni nga Button-->
+                    <input type="submit" value="💾 Append">
+
+                    <script>
+                        const fileInput = document.getElementById('fileInput');
+                        const previewContainer = document.getElementById('preview-container');
+
+                        //file upload ni dri
+                        uploadBtn.addEventListener('click', function() {
+                            fileInput.click();
+                        });
+
+                        fileInput.addEventListener('change', function() {
+                            if (fileInput.files.length > 0) {
+                            alert("Selected file: " + fileInput.files[0].name);
+                            }
+                        });
+
+                        // Age validation ni dri
+                        const postForm = document.getElementById('post-form');
+                        postForm.addEventListener('submit', function(event) {
+                            const age = parseInt(document.getElementById('age').value);
+                            if (age < 18) {
+                                alert('You must be at least 18 years old.');
+                                event.preventDefault();
+                                return;
+                            }
+
+                            const lvl = parseInt(document.getElementById('security-level').value);
+                            if (lvl < 1 || lvl > 5) {
+                                alert('Security Level must be between 1 and 5.');
+                                event.preventDefault();
+                                return;
+                            }
+                        });
+                    </script>
+                </form>
+            </div>
+        </section>
+        <div class="feed-wrapper">
+        <form method="get" action="{{ url_for('search_inmates') }}">
+            <input class="search-input" name="q" placeholder="Search by ID or Name..." value="{{ request.args.get('q','') }}">
+            <button type="submit">🔍</button>
+        </form>
+
+        <section class="feed-section">
+            {% for post in posts %}
+            <div class="post">
+                <div class="id"><p>{{ post.id }}</p></div>
+                <p><strong>Name: </strong>{{ post.name }}</p>
+                <p><strong>Age: </strong>{{ post.age }}</p>
+                <p><strong>Gender: </strong>{{ post.gender }}</p>
+                <p><strong>Nationality: </strong>{{ post.nationality }}</p>
+                <p><strong>Security Level: </strong>{{ post.security_level }}</p>
+                <p><strong>Date Apprehended: </strong>{{ post.date_apprehended }}</p>
+                <p><strong>Date Registered: </strong>{{ post.date_added }}</p>
+
+                <div class="interact-btn">
+                    {% if post.evidence_file %}
+                    <div class="download-btn">
+                        <a href="{{ url_for('static', filename='uploads/' ~ post.evidence_file) }}" target="_blank">📲 Download Evidence</a>
+                    </div>
+                    {% endif %}
+                    <div class="editdel-btn">
+                        <div class="delete-btn">
+                            <form action="{{ url_for('delete_inmate', inmate_id=post.id) }}" method="post">
+                                <button type="submit" onclick="return confirm('Are you sure you want to delete this inmate?');">🗑 Delete</button>
+                            </form>
+                        </div>
+                        <div class="edit-btn">
+                            <form action="{{ url_for('edit_inmate', inmate_id=post.id) }}" method="get">
+                                <button type="submit">🔩 Edit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <p>No inmates yet.</p>
+            {% endfor %}
+        </section>
+    </div>
+</div>
+{% endblock %}

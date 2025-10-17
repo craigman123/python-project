@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Home - IIMS 1.0</title>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <header>
+        <div>
+            <h1>Inmate Information Manager</h1>
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Company Logo" width="60" height="auto" style="border-radius: 50%; object-fit: cover;">
+        </div>
+   
+        <form class = "login" action="{{ url_for('login') }}" method="post" id="login-form">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <input type="submit" value="Login">
+        </form>
+    </header>
+    <main>
+        <aside>
+            <div class = "register">
+                <form action="{{ url_for('register') }}" method="post">
+                    <h3>Register</h3>
+                    {% if error %}
+                        <p class="error">{{ error }}</p>
+                    {% endif %}
+                    <input type="text" name="new_username" placeholder="Username" required>
+                    <input type="password" name="new_password" placeholder="Password" required>
+                    <input type="submit" value="Register">
+                    
+                </form>
+            </div>
+        </aside>
+    </main>
+</div>
+{% endblock %}
