@@ -13,7 +13,7 @@
 
     <main class="edit-main">
         <section class="edit-section">
-            <h2 class="edit-form-title">Edit Inmate Information</h2>
+                <h2 class="edit-form-title">Edit Inmate Information</h2>
 
             <form action="{{ url_for('edit_inmate', inmate_id=inmate.id) }}" 
                   method="post" enctype="multipart/form-data" id="edit-inmate-form">
@@ -23,7 +23,7 @@
                     <div class="name-inputs">
                         <input type="text" name="last" placeholder="Last" value="{{ last }}" required>
                         <input type="text" name="first" placeholder="First" value="{{ first }}" required>
-                        <input type="text" name="initial" placeholder="M.I." value="{{ initial }}" required>
+                        <input type="text" name="initial" placeholder="M.I." value="{{ initial }}">
                     </div>
                 </div>
 

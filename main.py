@@ -37,6 +37,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
+    badge = db.Column(db.Integer, unique=True, nullable=False )
     posts = db.relationship('Post', backref='author', lazy=True)
 
     def set_password(self, password):
@@ -71,8 +72,7 @@ def dashboard():
 
     if request.method == 'POST':
         
-        name = f"{request.form.get('last', '')} {request.form.get('first', '')} {request.form.get('initial', '')}".strip()
-
+        name = f"{request.form.get('last', '').capitalize()} {request.form.get('first', '').capitalize()} {request.form.get('initial', '').capitalize()}".strip()
         age = int(request.form['age'])
         gender = request.form['gender']
         nationality = request.form['nationality']
@@ -145,10 +145,12 @@ def search_inmates():
 def login():
     username = request.form['username']
     password = request.form['password']
-    user = User.query.filter_by(username=username).first()
+    badge = int(request.form['badge'])
+    user = User.query.filter_by(username=username, badge=badge).first()
 
     if user and user.check_password(password):
         session['username'] = username
+        session['badge'] = badge
         return redirect(url_for('dashboard'))
     else:
         error = "Invalid username or password - Register First:"
@@ -158,16 +160,24 @@ def login():
 def register():
     username = request.form['new_username']
     password = request.form['new_password']
-    user = User.query.filter_by(username=username).first()
-    if user:
+    badge = int(request.form['new_badge'])
+    
+    existing_user = User.query.filter_by(username=username).first()
+    existing_badge = User.query.filter_by(badge=badge).first()
+    
+    if existing_user:
         return render_template('index.html', error="Username already exists.")
-    else:
-        new_user = User(username=username)
-        new_user.set_password(password)
-        db.session.add(new_user)
-        db.session.commit()
-        session['username'] = username
-        return redirect(url_for('dashboard'))
+    elif existing_badge:
+        return render_template('index.html', error="Badge number already exists.")
+    
+    new_user = User(username=username, badge=badge)
+    new_user.set_password(password)
+    db.session.add(new_user)
+    db.session.commit()
+    
+    session['username'] = username
+    session['badge'] = badge
+    return redirect(url_for('dashboard'))
 
 @app.route('/logout')
 def logout():
@@ -199,7 +209,7 @@ def edit_inmate(inmate_id):
     inmate = Inmate.query.get_or_404(inmate_id)
 
     if request.method == 'POST':
-        inmate.name = f"{request.form['last']} {request.form['first']} {request.form['initial']}"
+        inmate.name = f"{request.form['last'].capitalize()} {request.form['first'].capitalize()} {request.form['initial'].capitalize()}"
         inmate.age = int(request.form['age'])
         inmate.gender = request.form['gender']
         inmate.nationality = request.form['nationality']

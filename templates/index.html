@@ -6,15 +6,16 @@
 
 {% block body %}
 <div class="container">
-    <header>
-        <div>
+    <header class="logo">
+        <div class="imgh1">
             <h1>Inmate Information Manager</h1>
-            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Company Logo" width="60" height="auto" style="border-radius: 50%; object-fit: cover;">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Company Logo" width="70" height="auto" style="border-radius: 50%; object-fit: cover;">
         </div>
    
         <form class = "login" action="{{ url_for('login') }}" method="post" id="login-form">
             <input type="text" name="username" placeholder="Username" required>
             <input type="password" name="password" placeholder="Password" required>
+            <input type="password" name="badge" placeholder="Badge ID" required>
             <input type="submit" value="Login">
         </form>
     </header>
@@ -28,11 +29,17 @@
                     {% endif %}
                     <input type="text" name="new_username" placeholder="Username" required>
                     <input type="password" name="new_password" placeholder="Password" required>
+                    <input type="password" name="new_badge" placeholder="Badge ID" required>
                     <input type="submit" value="Register">
                     
                 </form>
             </div>
         </aside>
     </main>
+    <footer>
+        <div class="footer">
+            This System is Confidential.
+        </div>
+    </footer>
 </div>
 {% endblock %}
